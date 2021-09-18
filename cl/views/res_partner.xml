@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="cl_inherit_res_partner" model="ir.ui.view">
+        <field name="name">res.partner.view.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_type']" position="after">
+                <div class="o_row">
+                    <field name="vendor_type" widget="radio" class="oe_edit_only" options="{'horizontal': true}"/>
+                    <field name="parent_agent" widget="res_partner_many2one" placeholder="Agent" domain="[('vendor_type', '=', 'agent')]" attrs="{'invisible': [('vendor_type', '!=', 'seller')]}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
