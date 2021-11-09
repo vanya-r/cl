@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <template id="portal_my_home_contacts" name="Show Contacts" inherit_id="portal.portal_my_home" customize_show="True" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Contacts</t>
+                <t t-set="url" t-value="'/my/contacts'"/>
+                <t t-set="placeholder_count" t-value="'contact_count'"/>
+            </t>
+        </xpath>
+    </template>
+    <template id="portal_my_contacts" name="My Contacts">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Contacts</t>
+            </t>
+            <t t-if="not contacts">
+                <p>There are currently no contacts for your account.</p>
+            </t>
+            <t t-if="contacts" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th class='d-none d-md-table-cell'>Mobile</th>
+                        <!-- <th/> -->
+                        <th class="text-right">Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="contacts" t-as="contact">
+                        <tr>
+                            <td>
+                                <a t-att-href="contact.get_portal_url(url)" t-att-title="contact.name">
+                                    <t t-esc="contact.name" t-if="contact.name != '/'"/>
+                                    <em t-else="">Draft</em>
+                                </a>
+                            </td>
+                            <td>
+                                <span t-field="contact.phone"/>
+                            </td>
+                            <td class='d-none d-md-table-cell'>
+                                <span t-field="contact.mobile"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="contact.email"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+            <div class="row mt8 mb8">
+                <div class="col-md-12">
+                    <a class="btn btn-primary" t-attf-href="/my/contacts/new">
+                        <div class="fa"/>
+                    Create New
+                    </a>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="portal_contact_page" name="Contact">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Contact</t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_body">
+                    <div class="row mb-4">
+                        <strong class="col-lg-2">Created on</strong>
+                        <span class="col-lg-10" t-field="contact.create_date" t-options='{"widget": "date"}'/>
+                    </div>
+                    <div class="row mb-4">
+                        <strong class="col-lg-10">Info:</strong>
+                        <p class="col-lg-10">
+                            <strong> Name:</strong>
+                            <span class="col-lg-10" t-field="contact.name"/>
+                        </p>
+                        <p class="col-lg-10">
+                            <strong> Email:</strong>
+                            <span class="col-lg-10" t-field="contact.email"/>
+                        </p>
+                        <p class="col-lg-10">
+                            <strong> Phone:</strong>
+                            <span class="col-lg-10" t-field="contact.phone"/>
+                            <strong> Mobile:</strong>
+                            <span class="col-lg-10" t-field="contact.mobile"/>
+                        </p>
+                        <p class="col-lg-10">
+                            <strong> Internal Notes:</strong>
+                            <span class="col-lg-10" t-field="contact.comment"/>
+                        </p>
+                    </div>
+                    <div class="row mt8 mb8">
+                        <div class="col-md-12">
+                            <a class="btn btn-primary" t-attf-href="/my/contacts/#{contact.id}/edit">
+                                <div class="fa"/>
+                    Edit
+                            </a>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    <template id="contacts_followup" name="Portal Contact Form">
+        <t t-call="portal.portal_layout">
+            <div id="wrap" class="o_my_contact_form container">
+                <t name="placeholder1"/>
+                <section id="contact_title" class="row">
+                    <div class="col-md-12">
+                        <h1>
+                            <t t-if="partner.id">
+                            Edit Contact
+                                <span t-esc="partner.name"/>
+                            </t>
+                            <t t-if="not partner.id">Add Contact</t>
+                        </h1>
+                    </div>
+                </section>
+                <t t-call="portal.portal_breadcrumbs"/>
+                <t t-set="additional_title">Contact Details</t>
+                <form action="/my/contacts/create" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="row o_portal_details">
+                        <div class="col-lg-8">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div t-if="error_message" class="alert alert-danger" role="alert">
+                                        <t t-foreach="error_message" t-as="err">
+                                            <t t-esc="err"/>
+                                            <br />
+                                        </t>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="id" t-att-value="id or partner.id" />
+                                <div t-attf-class="col-xl-6">
+                                    <label class="col-form-label" for="name">Name</label>
+                                    <input type="text" name="name" t-att-value="name or partner.name" />
+                                </div>
+                                <div t-attf-class="form-group col-xl-6">
+                                    <label class="col-form-label" for="email">Email</label>
+                                    <input type="email" name="email" t-att-value="email or partner.email" />
+                                </div>
+                                <div t-attf-class="form-group col-xl-6">
+                                    <label class="col-form-label" for="phone">Phone</label>
+                                    <input type="phone" name="phone" t-att-value="phone or partner.phone" />
+                                </div>
+                                <div t-attf-class="form-group col-xl-6">
+                                    <label class="col-form-label" for="mobile">Mobile</label>
+                                    <input type="mobile" name="mobile" t-att-value="mobile or partner.mobile" />
+                                </div>
+                                <div t-attf-class="form-group row-xl-10">
+                                    <label class="col-form-label" for="comment">Comment</label>
+                                    <textarea type="text" name="comment" t-att-value="comment or partner.comment" style="height: 250px;  width: 500px" />
+                                </div>
+                                <div class="form-group col-xl-6">
+                                    <button type="submit" class="btn btn-primary float-right mb32 ">
+                                Confirm
+                                        <span class="fa fa-long-arrow-right" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+</odoo>
