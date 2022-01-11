@@ -15,7 +15,9 @@ class Product_template_CL(models.Model):
     apn_1 = fields.Char(string='APN #1')
     apn_2 = fields.Char(string='APN #2')
     type = fields.Selection(selection_add=[
-        ('property', 'Property')], ondelete={'property': 'set default'})
+        ('property', 'Property')]
+        # , ondelete={'property': 'set default'}
+        )
     # currency_id_company = fields.Many2one('res.currency', 'Currency', compute='_compute_currency_id')
     deposit_amount = fields.Monetary(
         string='Deposit Amount', currency_field='currency_id')
